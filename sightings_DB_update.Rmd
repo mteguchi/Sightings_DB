@@ -86,6 +86,11 @@ missing.sightings <- anti_join(sightings.df,
                                turtle.sightings, 
                                by = "Sighting_Number")
 
+sighting.date <- apply(missing.sightings, 
+                       FUN = function(x) unlist(strsplit(x, split = "-"))[1], 
+                       MARGIN = 1) %>%
+  as.numeric() %>%
+  yyyymmdd2date()
 
 col.names <- colnames(turtle.sightings)
 out.df <- setNames(data.frame(matrix(ncol = length(col.names),
@@ -94,6 +99,7 @@ out.df <- setNames(data.frame(matrix(ncol = length(col.names),
 
 out.df[, "Sighting_Number"] <- missing.sightings$Sighting_Number
 out.df[, "Observed_By"] <- missing.sightings$Observed_By
+out.df[, "Date_Observed"] <- sighting.date
 
 write.csv(out.df, 
           file = paste0("data/data2upload_", Sys.Date(), ".csv"),
